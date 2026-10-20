@@ -1,27 +1,117 @@
 
 import './style.css';
-
-const question = {
-  id: 1,
-  domain: 'Cloud Concepts',
-  text: 'A company needs to increase or decrease its cloud resources as demand changes. Which cloud benefit does this describe?',
-  options: [
-    { id: 'a', text: 'High availability' },
-    { id: 'b', text: 'Scalability' },
-    { id: 'c', text: 'Disaster recovery' },
-    { id: 'd', text: 'Fault tolerance' },
-  ],
-  correctAnswer: 'b',
-  explanation:
-    'Scalability is the ability to increase or decrease resources to meet changing demand. High availability focuses on keeping services accessible, disaster recovery focuses on restoring services after a disruptive event, and fault tolerance focuses on continuing operation when components fail.',
-};
+import { questions } from './data/questions.js';
 
 const app = document.querySelector('#app');
 
+let currentQuestionIndex = 0;
 let selectedAnswer = null;
 let submitted = false;
+let answers = [];
+let showResults = false;
+
+function renderResults() {
+  const score = answers.filter(
+    (answer) => answer.isCorrect,
+  ).length;
+
+  const percentage = Math.round((score / questions.length) * 100);
+
+  const reviewItems = answers
+    .map((answer, index) => {
+      const question = questions.find(
+        (item) => item.id === answer.questionId,
+      );
+
+      return `
+        <article class="feedback ${answer.isCorrect ? 'correct' : 'incorrect'}">
+          <h3>Question ${index + 1}: ${answer.isCorrect ? 'Correct' : 'Incorrect'}</h3>
+          <p>${question.text}</p>
+          <p>
+            Your answer:
+            <strong>
+              ${question.options.find(
+                (option) => option.id === answer.selectedAnswer,
+              )?.text ?? 'No answer'}
+            </strong>
+          </p>
+          <p>
+            Correct answer:
+            <strong>
+              ${question.options.find(
+                (option) => option.id === question.correctAnswer,
+              ).text}
+            </strong>
+          </p>
+          <p>${question.explanation}</p>
+        </article>
+      `;
+    })
+    .join('');
+
+  app.innerHTML = `
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="CloudWise home">
+        <span class="brand-mark">C</span>
+        <span>CloudWise <span class="brand-light">AZ-900</span></span>
+      </a>
+      <span class="unofficial-label">Independent exam prep</span>
+    </header>
+
+    <main class="quiz-layout">
+      <section class="quiz-heading">
+        <p class="eyebrow">AZURE FUNDAMENTALS · RESULTS</p>
+        <h1>Practice complete.</h1>
+        <p>Review your answers and strengthen your understanding.</p>
+      </section>
+
+      <section class="question-card">
+        <p class="eyebrow">YOUR SCORE</p>
+        <h2>${score} out of ${questions.length}</h2>
+        <p>${percentage}% correct</p>
+        <p>
+          ${
+            percentage === 100
+              ? 'Excellent work. Keep practising to reinforce your understanding.'
+              : 'Review the explanations below, then try again to reinforce what you learned.'
+          }
+        </p>
+
+        <button id="restart-quiz" class="primary-button" type="button">
+          Try again
+        </button>
+      </section>
+
+      <section class="results-review">
+        <h2>Answer review</h2>
+        ${reviewItems}
+      </section>
+
+      <p class="disclaimer">
+        CloudWise is an independent learning project and is not affiliated with
+        or endorsed by Microsoft. Questions are original practice material.
+      </p>
+    </main>
+  `;
+
+  app.querySelector('#restart-quiz').addEventListener('click', () => {
+    currentQuestionIndex = 0;
+    selectedAnswer = null;
+    submitted = false;
+    answers = [];
+    showResults = false;
+    renderQuiz();
+  });
+}
 
 function renderQuiz() {
+  if (showResults) {
+    renderResults();
+    return;
+  }
+
+  const question = questions[currentQuestionIndex];
+
   const answerOptions = question.options
     .map(
       (option) => `
@@ -42,22 +132,23 @@ function renderQuiz() {
 
   if (submitted) {
     const isCorrect = selectedAnswer === question.correctAnswer;
+    const correctOption = question.options.find(
+      (option) => option.id === question.correctAnswer,
+    );
 
     feedback = `
       <section class="feedback ${isCorrect ? 'correct' : 'incorrect'}" aria-live="polite">
         <h2>${isCorrect ? 'Correct!' : 'Not quite.'}</h2>
         <p>
           Correct answer:
-          <strong>
-            ${question.options.find(
-              (option) => option.id === question.correctAnswer,
-            ).text}
-          </strong>
+          <strong>${correctOption.text}</strong>
         </p>
         <p>${question.explanation}</p>
       </section>
     `;
   }
+
+  const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
   app.innerHTML = `
     <header class="topbar">
@@ -80,7 +171,7 @@ function renderQuiz() {
       <section class="question-card">
         <div class="question-meta">
           <span class="domain-label">${question.domain}</span>
-          <span>Question 1 of 1</span>
+          <span>Question ${currentQuestionIndex + 1} of ${questions.length}</span>
         </div>
 
         <h2 class="question-text">${question.text}</h2>
@@ -95,13 +186,14 @@ function renderQuiz() {
           <span class="selection-hint">
             ${submitted ? 'Answer submitted' : 'Select one answer'}
           </span>
+
           <button
             id="submit-answer"
             class="primary-button"
             type="button"
-            ${selectedAnswer === null || submitted ? 'disabled' : ''}
+            ${selectedAnswer === null && !submitted ? 'disabled' : ''}
           >
-            ${submitted ? 'Answer submitted' : 'Check answer'}
+            ${submitted ? (isLastQuestion ? 'View results' : 'Next question') : 'Check answer'}
           </button>
         </div>
       </section>
@@ -123,11 +215,36 @@ function renderQuiz() {
   });
 
   app.querySelector('#submit-answer').addEventListener('click', () => {
-    if (selectedAnswer === null || submitted) return;
+    if (selectedAnswer === null) return;
 
-    submitted = true;
+    if (!submitted) {
+      const isCorrect = selectedAnswer === question.correctAnswer;
+
+      answers.push({
+        questionId: question.id,
+        selectedAnswer,
+        isCorrect,
+      });
+
+      submitted = true;
+      renderQuiz();
+      return;
+    }
+
+    if (isLastQuestion) {
+      showResults = true;
+    } else {
+      currentQuestionIndex += 1;
+      selectedAnswer = null;
+      submitted = false;
+    }
+
     renderQuiz();
   });
 }
 
-renderQuiz();
+if (questions.length === 0) {
+  app.innerHTML = '<main class="quiz-layout"><h1>No questions available</h1></main>';
+} else {
+  renderQuiz();
+}
