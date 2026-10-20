@@ -10,12 +10,85 @@ let submitted = false;
 let answers = [];
 let showResults = false;
 
+function summarizePerformance(answerRecords, questionBank) {
+  const questionsById = new Map(
+    questionBank.map((question) => [question.id, question]),
+  );
+
+  const domains = [];
+  const domainsByName = new Map();
+  const missedTopics = [];
+  const seenTopics = new Set();
+
+  for (const answer of answerRecords) {
+    const question = questionsById.get(answer.questionId);
+
+    if (!question) {
+      continue;
+    }
+
+    let domainSummary = domainsByName.get(question.domain);
+
+    if (!domainSummary) {
+      domainSummary = {
+        domain: question.domain,
+        correct: 0,
+        attempted: 0,
+      };
+      domainsByName.set(question.domain, domainSummary);
+      domains.push(domainSummary);
+    }
+
+    domainSummary.attempted += 1;
+
+    if (answer.isCorrect) {
+      domainSummary.correct += 1;
+    } else if (question.topic && !seenTopics.has(question.topic)) {
+      seenTopics.add(question.topic);
+      missedTopics.push(question.topic);
+    }
+  }
+
+  return { domains, missedTopics };
+}
+
 function renderResults() {
   const score = answers.filter(
     (answer) => answer.isCorrect,
   ).length;
 
   const percentage = Math.round((score / questions.length) * 100);
+  const performance = summarizePerformance(answers, questions);
+
+  const domainBreakdown = performance.domains
+    .map((domainSummary) => {
+      const domainPercent =
+        domainSummary.attempted === 0
+          ? 0
+          : Math.round(
+              (domainSummary.correct / domainSummary.attempted) * 100,
+            );
+
+      return `
+        <article class="domain-stat">
+          <span class="domain-label">${domainSummary.domain}</span>
+          <span class="domain-stat-score">
+            ${domainSummary.correct}/${domainSummary.attempted} correct (${domainPercent}%)
+          </span>
+        </article>
+      `;
+    })
+    .join('');
+
+  const revisionGuidance =
+    performance.missedTopics.length === 0
+      ? '<p>You answered every question in this attempt correctly. Review the explanations below to keep these topics fresh.</p>'
+      : `
+        <p>Revise these topics from this attempt:</p>
+        <ul class="revision-list">
+          ${performance.missedTopics.map((topic) => `<li>${topic}</li>`).join('')}
+        </ul>
+      `;
 
   const reviewItems = answers
     .map((answer, index) => {
@@ -80,6 +153,20 @@ function renderResults() {
         <button id="restart-quiz" class="primary-button" type="button">
           Try again
         </button>
+      </section>
+
+      <section class="results-breakdown">
+        <p class="eyebrow">THIS ATTEMPT</p>
+        <h2>Performance by domain</h2>
+        <div class="domain-stat-list">
+          ${domainBreakdown}
+        </div>
+        <h3>Revision guidance</h3>
+        ${revisionGuidance}
+        <p class="results-note">
+          This breakdown reflects this practice attempt only. It does not predict
+          AZ-900 exam results.
+        </p>
       </section>
 
       <section class="results-review">
