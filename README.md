@@ -6,7 +6,7 @@ CloudWise is not affiliated with or endorsed by Microsoft. It does not contain o
 
 ## Features
 
-- Twelve locally stored practice questions, organized by AZ-900 domain and topic.
+- Thirty-six locally stored practice questions, organized by AZ-900 domain, topic, and study objective.
 - Dashboard with question counts for each domain and the full bank.
 - Domain-specific and all-question practice sessions.
 - Completed-session history saved locally in the browser.
@@ -44,9 +44,9 @@ npm run preview
 
 ## Question content
 
-Question records are in `src/data/questions.js`. Each record has a unique `id`, `domain`, `topic`, `text`, an `options` array, a `correctAnswer` option ID, and an `explanation`. The app checks these basic fields before rendering.
+Question records are in `src/data/questions.js`. Each record has a unique `id`, `domain`, `topic`, `objective`, `text`, an `options` array, a `correctAnswer` option ID, and an `explanation`. The app checks basic question and option fields before rendering, and `npm test` checks the bank's structure and domain counts.
 
-The content is original practice material informed by the [official AZ-900 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900). The bank is intentionally small and does not cover every study-guide objective or mirror the exam's domain weighting. Scores and domain summaries describe only the questions attempted; they do not predict certification results. Review current Microsoft Learn materials when preparing for the exam.
+The content is original practice material informed by the [official AZ-900 study guide](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-900). The bank does not cover every study-guide objective or reproduce the exam's content or weighting. Scores and domain summaries describe only the questions attempted; they do not predict certification results. Review current Microsoft Learn materials when preparing for the exam.
 
 ## Limitations
 
