@@ -133,7 +133,7 @@ export const questions = [
     domain: "Azure Architecture and Services",
     topic: "Compute Services",
     objective: "Identify Azure Functions as an option for event-driven code",
-    text: "A team wants a short piece of code to run automatically in response to an Azure Blob Storage upload, without provisioning or managing a VM for the function. Which Azure compute option best fits?",
+    text: "A team wants code to run automatically when a file is uploaded to Azure Blob Storage, using a native Blob Storage trigger without provisioning or managing a VM. Which Azure compute option best fits?",
     options: [
       { id: "a", text: "Azure Virtual Machines" },
       { id: "b", text: "Azure Functions" },
@@ -242,7 +242,7 @@ export const questions = [
     domain: "Cloud Concepts",
     topic: "Cloud Benefits",
     objective: "Distinguish high availability from scalability",
-    text: "An architect wants a service to remain accessible when a component fails and to add capacity as demand grows. Which pair of cloud benefits is most directly relevant?",
+    text: "An architect wants users to keep accessing a service when one of its components fails. Separately, administrators will manually add compute capacity so the service can handle a larger workload. Which pair of cloud benefits best matches these goals?",
     options: [
       { id: "a", text: "High availability and scalability" },
       { id: "b", text: "Reliability and predictability" },
@@ -250,7 +250,7 @@ export const questions = [
       { id: "d", text: "Manageability and consumption-based pricing" }
     ],
     correctAnswer: "a",
-    explanation: "High availability aims to keep a service accessible, including through designs that reduce the impact of component failures. Scalability is the ability to handle increased workload by adding capacity. Elasticity more specifically describes dynamically matching capacity to changing demand."
+    explanation: "High availability aims to keep a service accessible when components fail. Scalability is the ability to handle a larger workload by adding capacity, including when administrators add it manually. Elasticity more specifically describes capacity that is dynamically added or removed as demand changes."
   },
   {
     id: 17,
@@ -505,7 +505,7 @@ export const questions = [
       { id: "d", text: "Azure Resource Health, which reports the health of individual resources" }
     ],
     correctAnswer: "b",
-    explanation: "Azure Service Health provides a personalized view of Azure service issues, planned maintenance, and health advisories relevant to services and regions an organization uses. Advisor gives deployment recommendations; Azure Monitor analyzes telemetry; Resource Health reports the health of individual resources."
+    explanation: "Azure Service Health provides a personalized view of service issues, planned maintenance, and health advisories for the services and regions an organization uses. To receive notifications through selected channels, configure Service Health alerts. Advisor gives deployment recommendations; Azure Monitor analyzes telemetry; Resource Health reports the health of individual resources."
   },
   {
     id: 34,
