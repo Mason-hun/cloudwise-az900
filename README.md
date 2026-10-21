@@ -1,8 +1,16 @@
 # CloudWise AZ-900
 
-CloudWise is an independent, unofficial study app for learners reviewing Microsoft Azure Fundamentals (AZ-900). Its dashboard lets learners choose a study domain or the complete question bank. Practice sessions provide answer explanations, an attempt score, a per-domain breakdown, revision topics for missed answers, and an answer review.
+CloudWise is an independent, unofficial practice app for learners preparing for Microsoft Azure Fundamentals (AZ-900). It helps learners practise cloud concepts, understand why answers are correct, review their performance, and revisit questions they most recently answered incorrectly.
+
+**[Open the live demo](https://cloudwise-az900.vercel.app/)** · [View the source code](https://github.com/Mason-hun/cloudwise-az900)
 
 CloudWise is not affiliated with or endorsed by Microsoft. It does not contain official or copied certification exam questions.
+
+## The problem and solution
+
+Preparing for a fundamentals certification involves more than checking whether an answer is right. Learners also need to understand the reasoning, identify topics they find difficult, and revisit mistakes.
+
+CloudWise brings these steps into a simple practice loop: choose a study domain, answer questions and read explanations, review the completed session, then use targeted revision to revisit questions whose most recent recorded answer was incorrect.
 
 ## Features
 
@@ -16,6 +24,17 @@ CloudWise is not affiliated with or endorsed by Microsoft. It does not contain o
 - Restartable quiz with no account or backend.
 - Responsive layout and keyboard-operable answer controls.
 
+## How it works
+
+The app uses a small client-side architecture:
+
+1. **Question bank:** Static question records live in `src/data/questions.js`.
+2. **Practice session:** Browser-side application code presents questions, checks selected answers, and provides explanations.
+3. **Results and revision:** Completed sessions produce a score, domain summary, answer review, and a targeted revision list.
+4. **Local history:** Completed attempts are saved in the browser's `localStorage`, allowing progress to persist in that browser.
+
+There is no server-side application or account system in the current version. Practice history is local to the browser and is not synchronized across devices.
+
 ## Requirements
 
 - Node.js 20.19+ or 22.12+ (Vite 8 requirement).
@@ -23,7 +42,11 @@ CloudWise is not affiliated with or endorsed by Microsoft. It does not contain o
 
 ## Setup and usage
 
+Clone the repository and install dependencies:
+
 ```sh
+git clone https://github.com/Mason-hun/cloudwise-az900.git
+cd cloudwise-az900
 npm install
 npm run dev
 ```
@@ -42,6 +65,12 @@ Preview the built site locally with:
 npm run preview
 ```
 
+Run the automated tests with:
+
+```sh
+npm test
+```
+
 ## Question content
 
 Question records are in `src/data/questions.js`. Each record has a unique `id`, `domain`, `topic`, `objective`, `text`, an `options` array, a `correctAnswer` option ID, and an `explanation`. The app checks basic question and option fields before rendering, and `npm test` checks the bank's structure and domain counts.
@@ -56,8 +85,6 @@ The content is original practice material informed by the [official AZ-900 study
 - Use **Reset saved practice history** on the dashboard and confirm the prompt to delete stored attempts from this browser. Clearing browser site data also removes this history.
 - The question bank is static and has not been validated through formal learner research.
 - The project is a learning prototype, not an official exam simulator.
-
-Run the focused local-storage and history tests with `npm test`.
 
 ## Deployment
 
